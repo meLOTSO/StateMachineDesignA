@@ -1,0 +1,14 @@
+C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\bin\Debug\net10.0\StateMachine.exe
+C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\bin\Debug\net10.0\StateMachine.deps.json
+C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\bin\Debug\net10.0\StateMachine.runtimeconfig.json
+C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\bin\Debug\net10.0\StateMachine.dll
+C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\bin\Debug\net10.0\StateMachine.pdb
+C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\obj\Debug\net10.0\StateMachine.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\obj\Debug\net10.0\StateMachine.AssemblyInfoInputs.cache
+C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\obj\Debug\net10.0\StateMachine.AssemblyInfo.cs
+C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\obj\Debug\net10.0\StateMachine.csproj.CoreCompileInputs.cache
+C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\obj\Debug\net10.0\StateMachine.dll
+C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\obj\Debug\net10.0\refint\StateMachine.dll
+C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\obj\Debug\net10.0\StateMachine.pdb
+C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\obj\Debug\net10.0\StateMachine.genruntimeconfig.cache
+C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\obj\Debug\net10.0\ref\StateMachine.dll
