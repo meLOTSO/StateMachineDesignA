@@ -1,54 +1,35 @@
-public delegate void StateChanger<TState>(TState state) where TState : notnull;
+namespace StateMachine.Core;
 
-public class StateMachineContext<TState, TValue> where TState : notnull
+public delegate void StateChanger(string state);
+public delegate void RequestDelegate(StateMachineContext context);
+
+public class StateMachineContext : IStateValueProvider<string, RequestDelegate>
 {
-    private readonly Dictionary<TState, TValue> _stateValues = new();
-    private TState? _currentState;
-    private TValue? _currentValue;
-    private event EventHandler<StateChangedEventArgs<TState, TValue>>? _onStateChange;
+    private string? _currentState;
+    private RequestDelegate? _currentValue;
 
-    public IReadOnlyDictionary<TState, TValue> StateValues { get => _stateValues; }
-    public TState? CurrentState { get => _currentState; }
-    public TValue? CurrentValue { get => _currentValue; }
-    public event EventHandler<StateChangedEventArgs<TState, TValue>>? OnStateChange
+    protected Dictionary<string, RequestDelegate> stateValues { get; set; } = new();
+
+    public IReadOnlyDictionary<string, RequestDelegate> StateValues { get => stateValues; }
+    public string? CurrentState { get => _currentState; }
+    public RequestDelegate? CurrentValue { get => _currentValue; }
+
+    public RequestDelegate? GetValue(string state)
     {
-        add => _onStateChange += value;
-        remove => _onStateChange -= value;
+        var value = stateValues.GetValueOrDefault(state);
+        return value;
     }
 
-    public virtual void SetState(TState state)
+    public bool TryGetValue(string state, out RequestDelegate value)
     {
-        if (_stateValues.TryGetValue(state, out _currentValue))
+        return stateValues.TryGetValue(state, out value!);
+    }
+
+    public virtual void SetState(string state)
+    {
+        if (stateValues.TryGetValue(state, out _currentValue))
         {
-            _onStateChange?.Invoke(this, new(_currentState!, state, _currentValue));
             _currentState = state;
         }
-    }
-
-    public void AddStateChangeHandler(EventHandler<StateChangedEventArgs<TState, TValue>> action)
-    {
-        _onStateChange += action;
-    }
-
-    public void RemoveStateChangeHandler(EventHandler<StateChangedEventArgs<TState, TValue>> action)
-    {
-        _onStateChange -= action;
-    }
-
-    public virtual void Register(TState state, TValue value)
-    {
-        _stateValues.TryAdd(state, value);
-    }
-
-    public virtual void ForEach(Action<TState, TValue> action)
-    {
-        foreach (var (state, value) in _stateValues)
-            action?.Invoke(state, value);
-    }
-
-    public virtual void ApplyFor(TState state, Action<TValue> action)
-    {
-        if (_stateValues.TryGetValue(state, out var value))
-            action?.Invoke(value);
     }
 }

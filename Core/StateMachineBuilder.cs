@@ -1,14 +1,11 @@
-public class StateMachineBuilder<TState, TValue> where TState : notnull
+namespace StateMachine.Core;
+
+public class StateMachineBuilder
 {
-    protected StateMachineContext<TState, TValue> Context { get; } = new();
+    protected StateMachineContextBuilder Context { get; } = new();
 
-    public virtual void Register(TState state, TValue value)
+    public StateMachine Build()
     {
-        this.Context.Register(state, value);
-    }
-
-    public StateMachine<TState, TValue> Build()
-    {
-        return new StateMachine<TState, TValue>(this.Context);
+        return new StateMachine(this.Context);
     }
 }

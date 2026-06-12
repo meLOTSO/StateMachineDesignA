@@ -1,8 +1,6 @@
-﻿var builder = new StateMachineBuilder<GameStates, string>();
+﻿using StateMachine.Core;
 
-builder.Register(GameStates.Menu, "menu");
-builder.Register(GameStates.Game, "game");
-builder.Register(GameStates.Lose, "lose");
+var builder = new StateMachineBuilder();
 
 var sm = builder.Build();
 
@@ -34,4 +32,4 @@ sm.Use((context) =>
     }
 });
 
-sm.Run();
+sm.Run(TimeSpan.FromMilliseconds(1 / 60));
