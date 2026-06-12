@@ -1,39 +1,48 @@
+using StateMachine.Core.Delegate;
+using StateMachine.Abstracts;
+
 namespace StateMachine.Core;
 
 public class StateMachine
 {
-    protected StateMachineContextBuilder Context { get; set; } = new();
-    private volatile bool _isRunning = false;
+    protected volatile bool IsRunning = false;
+    protected MutableStateMachineContextBase MutableContext { get; init; }
 
-    public RequestDelegate? _useHandlers;
-    public StateMachineContext StateMachineContext { get => (StateMachineContext)Context; }
+    public event RequestDelegate? OnRun;
+    public TimeSpan DeltaTime { get; set; } = TimeSpan.FromSeconds(1 / 60);
+    public StateMachineContextBase Context { get => MutableContext; }
 
-    public StateMachine(StateMachineContextBuilder context)
+    public StateMachine(MutableStateMachineContextBase context)
     {
-        Context = context ?? throw new ArgumentNullException(nameof(context));
+        MutableContext = context ?? throw new ArgumentNullException(nameof(context));
     }
 
+    // StateMachine: (context) => ...
     public virtual void Use(RequestDelegate action)
     {
-        _useHandlers += action;
+        OnRun += action;
     }
-
     public virtual void Map(string state, RequestDelegate action)
     {
-        Context.Append(state, action);
+        MutableContext.Mutate((stateValues) =>
+        {
+            if (!stateValues.TryAdd(state, action))
+                stateValues[state] += action;
+        });
     }
 
-    public virtual void Run(TimeSpan dt)
+    public virtual void Run()
     {
-        if (_isRunning) throw new InvalidOperationException("Already running");
-        _isRunning = true;
+        if (IsRunning) throw new InvalidOperationException("Already running");
 
-        while (_isRunning)
+        IsRunning = true;
+
+        while (IsRunning)
         {
-            _useHandlers?.Invoke(this.Context);
-            Thread.Sleep(dt);
+            OnRun?.Invoke(Context);
+            MutableContext.CurrentValue?.Invoke(Context);
+            Thread.Sleep(DeltaTime);
         }
     }
-
-    public virtual void Stop() => _isRunning = false;
+    public virtual void Stop() => IsRunning = false;
 }

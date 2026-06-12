@@ -1,35 +1,44 @@
 namespace StateMachine.Core;
 
-public delegate void StateChanger(string state);
-public delegate void RequestDelegate(StateMachineContext context);
+using System.Collections.Generic;
 
-public class StateMachineContext : IStateValueProvider<string, RequestDelegate>
+public class StateMachineContext : IStateMachineContext<string, RequestDelegate>, IMutable<Dictionary<string, StateValuesCollection<RequestDelegate>>>
 {
-    private string? _currentState;
-    private RequestDelegate? _currentValue;
+    protected Dictionary<string, StateValuesCollection<RequestDelegate>> StateValuesDictionary { get; } = new();
+    protected string State = string.Empty;
+    protected StateValuesCollection<RequestDelegate> Value;
 
-    protected Dictionary<string, RequestDelegate> stateValues { get; set; } = new();
+    public Dictionary<string, object?> Data { get; } = new();
+    public IReadOnlyDictionary<string, StateValuesCollection<RequestDelegate>> StateValuesData => StateValuesDictionary;
+    public string CurrentState => State;
+    public StateValuesCollection<RequestDelegate> CurrentValue => Value;
 
-    public IReadOnlyDictionary<string, RequestDelegate> StateValues { get => stateValues; }
-    public string? CurrentState { get => _currentState; }
-    public RequestDelegate? CurrentValue { get => _currentValue; }
-
-    public RequestDelegate? GetValue(string state)
+    public List<RequestDelegate>? GetValuesCollection(string state)
     {
-        var value = stateValues.GetValueOrDefault(state);
-        return value;
+        if (string.IsNullOrWhiteSpace(state))
+            return null;
+
+        return StateValuesDictionary.GetValueOrDefault(state).Values;
     }
 
-    public bool TryGetValue(string state, out RequestDelegate value)
+    public void Mutate(Action<Dictionary<string, StateValuesCollection<RequestDelegate>>> action)
+        => action?.Invoke(StateValuesDictionary);
+
+    public void SetState(string state)
     {
-        return stateValues.TryGetValue(state, out value!);
+        if (string.IsNullOrWhiteSpace(state)) return;
+
+        if (StateValuesDictionary.TryGetValue(state, out Value))
+            State = state;
     }
 
-    public virtual void SetState(string state)
+    public bool TryGetValuesCollection(string state, out List<RequestDelegate> value)
     {
-        if (stateValues.TryGetValue(state, out _currentValue))
+        if (string.IsNullOrWhiteSpace(state))
         {
-            _currentState = state;
+            value = [];
+            return false;
         }
+        return StateValuesDictionary.TryGetValue(state, out value);
     }
 }

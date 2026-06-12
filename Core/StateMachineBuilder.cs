@@ -1,8 +1,10 @@
+using StateMachine.Abstracts;
+
 namespace StateMachine.Core;
 
 public class StateMachineBuilder
 {
-    protected StateMachineContextBuilder Context { get; } = new();
+    protected StateMachineContext Context { get; }
 
     public StateMachine Build()
     {

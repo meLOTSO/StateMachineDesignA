@@ -1,9 +1,13 @@
+using StateMachine.Core;
+
+namespace StateMachine.Abstracts;
+
 public interface IStateValueProvider<TState, TValue> where TState : notnull
 {
-    IReadOnlyDictionary<TState, TValue> StateValues { get; }
+    IReadOnlyDictionary<TState, StateValuesContainer<TValue>> StateValues { get; }
     TState? CurrentState { get; }
-    TValue? CurrentValue { get; }
+    StateValuesContainer<TValue> CurrentValue { get; }
 
-    TValue? GetValue(TState state);
-    bool TryGetValue(TState state, out TValue value);
+    StateValuesContainer<TValue>? GetValuesCollection(TState state);
+    bool TryGetValuesCollection(TState state, out StateValuesContainer<TValue> value);
 }
