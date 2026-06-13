@@ -12,3 +12,4 @@ C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\obj\Debug\net10.
 C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\obj\Debug\net10.0\StateMachine.pdb
 C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\obj\Debug\net10.0\StateMachine.genruntimeconfig.cache
 C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\obj\Debug\net10.0\ref\StateMachine.dll
+C:\Users\MOLL\OneDrive\Документы\PROJECTS\StateMachine\obj\Debug\net10.0\StateMachine.sourcelink.json

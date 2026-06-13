@@ -1,4 +1,3 @@
-using StateMachine.Core.Delegate;
 using StateMachine.Abstracts;
 
 namespace StateMachine.Core;
@@ -6,13 +5,14 @@ namespace StateMachine.Core;
 public class StateMachine
 {
     protected volatile bool IsRunning = false;
-    protected MutableStateMachineContextBase MutableContext { get; init; }
+    protected StateMachineContext MutableContext { get; init; }
 
     public event RequestDelegate? OnRun;
     public TimeSpan DeltaTime { get; set; } = TimeSpan.FromSeconds(1 / 60);
-    public StateMachineContextBase Context { get => MutableContext; }
+    public IStateMachineContext<string, RequestDelegate> Context { get => MutableContext; }
+    public Dictionary<string, object?> Data { get; } = new();
 
-    public StateMachine(MutableStateMachineContextBase context)
+    public StateMachine(StateMachineContext context)
     {
         MutableContext = context ?? throw new ArgumentNullException(nameof(context));
     }
@@ -24,10 +24,10 @@ public class StateMachine
     }
     public virtual void Map(string state, RequestDelegate action)
     {
-        MutableContext.Mutate((stateValues) =>
+        MutableContext.RegisterState(state);
+        MutableContext.Mutate((stateMap) =>
         {
-            if (!stateValues.TryAdd(state, action))
-                stateValues[state] += action;
+            stateMap[state].Add(action);
         });
     }
 
@@ -40,7 +40,7 @@ public class StateMachine
         while (IsRunning)
         {
             OnRun?.Invoke(Context);
-            MutableContext.CurrentValue?.Invoke(Context);
+            MutableContext.CurrentValues.ForEach((act) => act?.Invoke(Context));
             Thread.Sleep(DeltaTime);
         }
     }

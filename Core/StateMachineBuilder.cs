@@ -4,7 +4,7 @@ namespace StateMachine.Core;
 
 public class StateMachineBuilder
 {
-    protected StateMachineContext Context { get; }
+    protected StateMachineContext Context { get; } = new();
 
     public StateMachine Build()
     {
