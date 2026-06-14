@@ -1,21 +1,22 @@
 using StateMachine.Abstracts;
+using StateMachine.Delegates;
 
-namespace StateMachine.Core;
+namespace StateMachine.Abstracts;
 
-public abstract class StateMachineBase<TState, TValue> where TState : notnull
+public abstract class StateMachineBase
 {
-    protected IMutableStateMachineContext<TState, TValue> MutableContext { get; init; }
+    protected IMutableStateMachineContext MutableContext { get; init; }
 
-    public IStateMachineContext<TState, TValue> Context { get => MutableContext; }
+    public IStateMachineContext Context { get => MutableContext; }
     public Dictionary<string, object?> Data { get; } = [];
 
-    public StateMachineBase(IMutableStateMachineContext<TState, TValue> context)
+    public StateMachineBase(IMutableStateMachineContext context)
     {
         MutableContext = context ?? throw new ArgumentNullException(nameof(context));
     }
 
-    public abstract void Use(TValue action);
-    public abstract void Map(string state, TValue action);
+    public abstract void Use(StateHandler action);
+    public abstract void Map(string state, StateHandler action);
 
     public abstract void Run();
     public abstract void Stop();

@@ -1,29 +1,30 @@
 using StateMachine.Abstracts;
 using StateMachine.Delegates;
+using StateMachine.Extensions;
 
 namespace StateMachine.Core;
 
-public class StateMachine : StateMachineBase<string, RequestDelegate>
+public class StateMachine : StateMachineBase
 {
     protected volatile bool IsRunning = false;
-    public event RequestDelegate? OnRun;
+    public event StateHandler? OnRun;
     public TimeSpan DeltaTime { get; set; } = TimeSpan.FromSeconds(1 / 60);
 
-    public StateMachine(StateMachineContext context) : base(context)
+    public StateMachine(IMutableStateMachineContext context) : base(context)
     {
     }
 
-    public override void Use(RequestDelegate action)
+    public override void Use(StateHandler action)
     {
         OnRun += action;
     }
-    public override void Map(string state, RequestDelegate action)
+    public override void Map(string state, StateHandler action)
     {
         MutableContext.Mutate((stateMap) =>
         {
             if (!stateMap.TryGetValue(state, out var bag))
             {
-                bag = new StateBag<RequestDelegate>();
+                bag = new StateBag<StateHandler>();
                 stateMap[state] = bag;
             }
             bag.Add(action);
@@ -44,4 +45,6 @@ public class StateMachine : StateMachineBase<string, RequestDelegate>
         }
     }
     public override void Stop() => IsRunning = false;
+
+    public void RemoveEmptyStates() => MutableContext.RemoveEmptyStates();
 }

@@ -1,7 +1,8 @@
 using StateMachine.Core;
+using StateMachine.Delegates;
 
 namespace StateMachine.Abstracts;
 
-public interface IMutableStateMachineContext<TState, TValue> : IStateMachineContext<TState, TValue>, IMutable<Dictionary<TState, StateBag<TValue>>> where TState : notnull
+public interface IMutableStateMachineContext : IStateMachineContext, IMutable<Dictionary<string, StateBag<StateHandler>>>
 {
 }

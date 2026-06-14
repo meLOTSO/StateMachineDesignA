@@ -1,8 +1,10 @@
+using StateMachine.Delegates;
+
 namespace StateMachine.Abstracts;
 
-public interface IStateMachineContext<TState, TValue> : IStateValueProvider<TState, TValue> where TState : notnull
+public interface IStateMachineContext : IStateValueProvider<string, StateHandler>
 {
     Dictionary<string, object?> Metadata { get; }
 
-    bool SetState(TState state);
+    bool SetState(string state);
 }

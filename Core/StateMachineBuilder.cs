@@ -2,7 +2,7 @@ namespace StateMachine.Core;
 
 public class StateMachineBuilder
 {
-    protected StateMachineContext Context { get; } = new();
+    protected MutableStateMachineContext Context { get; } = new();
 
     public StateMachine Build()
     {
