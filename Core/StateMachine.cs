@@ -1,37 +1,36 @@
 using StateMachine.Abstracts;
+using StateMachine.Delegates;
 
 namespace StateMachine.Core;
 
-public class StateMachine
+public class StateMachine : StateMachineBase<string, RequestDelegate>
 {
     protected volatile bool IsRunning = false;
-    protected StateMachineContext MutableContext { get; init; }
-
     public event RequestDelegate? OnRun;
     public TimeSpan DeltaTime { get; set; } = TimeSpan.FromSeconds(1 / 60);
-    public IStateMachineContext<string, RequestDelegate> Context { get => MutableContext; }
-    public Dictionary<string, object?> Data { get; } = new();
 
-    public StateMachine(StateMachineContext context)
+    public StateMachine(StateMachineContext context) : base(context)
     {
-        MutableContext = context ?? throw new ArgumentNullException(nameof(context));
     }
 
-    // StateMachine: (context) => ...
-    public virtual void Use(RequestDelegate action)
+    public override void Use(RequestDelegate action)
     {
         OnRun += action;
     }
-    public virtual void Map(string state, RequestDelegate action)
+    public override void Map(string state, RequestDelegate action)
     {
-        MutableContext.RegisterState(state);
         MutableContext.Mutate((stateMap) =>
         {
-            stateMap[state].Add(action);
+            if (!stateMap.TryGetValue(state, out var bag))
+            {
+                bag = new StateBag<RequestDelegate>();
+                stateMap[state] = bag;
+            }
+            bag.Add(action);
         });
     }
 
-    public virtual void Run()
+    public override void Run()
     {
         if (IsRunning) throw new InvalidOperationException("Already running");
 
@@ -40,9 +39,9 @@ public class StateMachine
         while (IsRunning)
         {
             OnRun?.Invoke(Context);
-            MutableContext.CurrentValues.ForEach((act) => act?.Invoke(Context));
+            MutableContext?.CurrentValues?.ForEach((act) => act?.Invoke(Context));
             Thread.Sleep(DeltaTime);
         }
     }
-    public virtual void Stop() => IsRunning = false;
+    public override void Stop() => IsRunning = false;
 }

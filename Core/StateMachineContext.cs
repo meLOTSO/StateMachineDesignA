@@ -1,26 +1,29 @@
 using StateMachine.Abstracts;
+using StateMachine.Delegates;
 
 namespace StateMachine.Core;
 
-public class StateMachineContext : IMutableStateMachineContext<
-    string,
-    RequestDelegate,
-    Dictionary<string, StateBag<RequestDelegate>>>
+public class StateMachineContext : IMutableStateMachineContext<string, RequestDelegate>
 {
-    protected Dictionary<string, StateBag<RequestDelegate>> StateContainers { get; } = new();
-    protected string State = string.Empty;
+    private static readonly List<RequestDelegate> EmptyList = new();
+    private static readonly Dictionary<string, object?> EmptyDictionary = new();
+
+    private Dictionary<string, StateBag<RequestDelegate>> _stateMap { get; } = new();
+    private string _currentState = string.Empty;
+    private StateBag<RequestDelegate> _bag = new();
+    private bool _autoCreateStates = true;
 
     public Dictionary<string, object?> Metadata { get; } = new();
-    public IReadOnlyDictionary<string, StateBag<RequestDelegate>> StateMap => StateContainers;
-    public string CurrentState => State;
-    public StateBag<RequestDelegate>? CurrentBag => GetBag(CurrentState);
-    public List<RequestDelegate>? CurrentValues => GetValues(CurrentState);
-    public Dictionary<string, object?>? CurrentData => GetData(CurrentState);
+    public IReadOnlyDictionary<string, StateBag<RequestDelegate>> StateMap => _stateMap;
+    public string CurrentState => _currentState;
+    public StateBag<RequestDelegate> CurrentBag => _bag;
+    public List<RequestDelegate> CurrentValues => _bag.Values;
+    public Dictionary<string, object?> CurrentData => _bag.Data;
 
     public StateBag<RequestDelegate>? GetBag(string state)
     {
         if (string.IsNullOrWhiteSpace(state)) return null;
-        return StateContainers.GetValueOrDefault(state);
+        return _stateMap.GetValueOrDefault(state);
     }
     public List<RequestDelegate>? GetValues(string state)
     {
@@ -32,24 +35,40 @@ public class StateMachineContext : IMutableStateMachineContext<
     }
     public T? GetData<T>(string state, string key)
     {
-        if (GetData(state)?.GetValueOrDefault(key) is T value) return value;
+        var data = GetData(state);
+        if (data is not null && data.TryGetValue(key, out var obj) && obj is T value)
+            return value;
         return default;
     }
 
     public void Mutate(Action<Dictionary<string, StateBag<RequestDelegate>>> action)
-        => action?.Invoke(StateContainers);
+        => action?.Invoke(_stateMap);
 
-    public void SetState(string state)
+    public bool SetState(string state)
     {
-        if (string.IsNullOrWhiteSpace(state)) return;
-        State = state;
+        if (string.IsNullOrWhiteSpace(state)) return false;
+
+        if (!_stateMap.TryGetValue(state, out var bag))
+        {
+            if (!_autoCreateStates)
+                throw new InvalidOperationException($"State '{state}' is not registered. Auto-creation is disabled.");
+
+            bag = new StateBag<RequestDelegate>();
+            _stateMap[state] = bag;
+        }
+        _currentState = state;
+        _bag = bag;
+        return true;
     }
+
+    public void DisableAutoCreate() => _autoCreateStates = false;
+    public void EnableAutoCreate() => _autoCreateStates = true;
 
     public bool TryGetBag(string state, out StateBag<RequestDelegate> bag)
     {
-        if (string.IsNullOrWhiteSpace(state) || !StateContainers.TryGetValue(state, out var value))
+        if (string.IsNullOrWhiteSpace(state) || !_stateMap.TryGetValue(state, out var value))
         {
-            bag = new();
+            bag = null!;
             return false;
         }
         bag = value;
@@ -63,7 +82,7 @@ public class StateMachineContext : IMutableStateMachineContext<
             value = bag.Values;
             return true;
         }
-        value = [];
+        value = EmptyList;
         return false;
     }
 
@@ -74,7 +93,7 @@ public class StateMachineContext : IMutableStateMachineContext<
             data = bag.Data;
             return true;
         }
-        data = new();
+        data = EmptyDictionary;
         return false;
     }
     public bool TryGetData<T>(string state, string key, out T? value)
@@ -86,11 +105,5 @@ public class StateMachineContext : IMutableStateMachineContext<
         }
         value = val;
         return true;
-    }
-
-    public bool RegisterState(string state)
-    {
-        var bag = new StateBag<RequestDelegate>();
-        return StateContainers.TryAdd(state, bag);
     }
 }

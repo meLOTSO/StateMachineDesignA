@@ -1,5 +1,3 @@
-using StateMachine.Abstracts;
-
 namespace StateMachine.Core;
 
 public class StateMachineBuilder

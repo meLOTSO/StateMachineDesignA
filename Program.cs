@@ -15,7 +15,7 @@ sm.Map("menu", (context) =>
     Console.WriteLine("MENU");
     Console.WriteLine("Enter [Space] to start");
 
-    if (Console.ReadKey().Key == ConsoleKey.Spacebar)
+    if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Spacebar)
     {
         context.SetState("load");
         sm.Data["start"] = DateTime.Now;

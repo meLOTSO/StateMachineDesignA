@@ -6,9 +6,9 @@ public interface IStateValueProvider<TState, TValue> where TState : notnull
 {
     IReadOnlyDictionary<TState, StateBag<TValue>> StateMap { get; }
     TState CurrentState { get; }
-    StateBag<TValue>? CurrentBag { get; }
-    List<TValue>? CurrentValues { get; }
-    Dictionary<string, object?>? CurrentData { get; }
+    StateBag<TValue> CurrentBag { get; }
+    List<TValue> CurrentValues { get; }
+    Dictionary<string, object?> CurrentData { get; }
 
     StateBag<TValue>? GetBag(TState state);
     List<TValue>? GetValues(TState state);
@@ -19,6 +19,4 @@ public interface IStateValueProvider<TState, TValue> where TState : notnull
     bool TryGetValues(TState state, out List<TValue> value);
     bool TryGetData(TState state, out Dictionary<string, object?> data);
     bool TryGetData<T>(TState state, string key, out T? value);
-
-    bool RegisterState(TState state);
 }
