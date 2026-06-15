@@ -10,7 +10,7 @@ sm.DeltaTime = TimeSpan.FromMilliseconds(1);
 sm.Context.SetState("menu");
 StringBuilder sb = new("");
 
-sm.Map("menu", (context) =>
+sm.Map("menu", (context, _) =>
 {
     Console.WriteLine("MENU");
     Console.WriteLine("Enter [Space] to start");
@@ -24,7 +24,7 @@ sm.Map("menu", (context) =>
 
 string points = "";
 TimeSpan sp = TimeSpan.FromSeconds(3);
-sm.Map("load", (context) =>
+sm.Map("load", (context, _) =>
 {
     if (sm.Data["start"] is DateTime d && DateTime.Now - d >= sp)
         context.SetState("game");
@@ -42,13 +42,13 @@ char[] buffer = new char[WIDTH * HEIGHT];
 for (int i = 0; i < buffer.Length; i++)
     buffer[i] = '.';
 
-sm.Map("game", (context) =>
+sm.Map("game", (context, _) =>
 {
     Console.Clear();
     Console.WriteLine(buffer);
 });
 
-sm.Map("end", (context) =>
+sm.Map("end", (context, _) =>
 {
     if (sb.Length == 0)
     {

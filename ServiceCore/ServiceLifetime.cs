@@ -3,6 +3,6 @@ namespace StateMachine.ServiceCore;
 public enum ServiceLifetime
 {
     Singleton,
-    Scope,
+    Scoped,
     Transient
 }

@@ -1,15 +1,34 @@
 namespace StateMachine.ServiceCore;
 
-public struct ServiceDescriptor
+public class ServiceDescriptor
 {
     public Type ServiceType { get; }
     public Type? ImplementationType { get; }
+    public object? ImplementationInstance { get; }
+    public Func<IServiceProvider, object>? ImplementationFactory { get; }
     public ServiceLifetime Lifetime { get; }
 
+    public ServiceDescriptor(Type serviceType, ServiceLifetime lifetime)
+    {
+        ServiceType = serviceType;
+        Lifetime = lifetime;
+    }
     public ServiceDescriptor(Type serviceType, Type implementationType, ServiceLifetime lifetime)
     {
         ServiceType = serviceType;
         ImplementationType = implementationType;
+        Lifetime = lifetime;
+    }
+    public ServiceDescriptor(Type serviceType, object instance, ServiceLifetime lifetime)
+    {
+        ServiceType = serviceType;
+        ImplementationInstance = instance;
+        Lifetime = lifetime;
+    }
+    public ServiceDescriptor(Type serviceType, Func<IServiceProvider, object> factory, ServiceLifetime lifetime)
+    {
+        ServiceType = serviceType;
+        ImplementationFactory = factory;
         Lifetime = lifetime;
     }
 }
