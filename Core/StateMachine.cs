@@ -46,8 +46,8 @@ public class StateMachine : StateMachineBase
 
         while (IsRunning)
         {
-            OnRun?.Invoke(Context);
-            MutableContext?.CurrentValues?.ForEach((act) => act?.Invoke(Context));
+            OnRun?.Invoke(Context, _serviceProvider);
+            MutableContext?.CurrentValues?.ForEach((act) => act?.Invoke(Context, _serviceProvider));
             Thread.Sleep(DeltaTime);
         }
     }
